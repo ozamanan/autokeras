@@ -53,15 +53,20 @@ class ImageBlock(block_module.Block):
         if augment is None:
             augment = hp.Boolean('augment', default=False)
         if normalize:
-            output_node = preprocessing.Normalization().build(hp, output_node)
+            with hp.conditional_scope('normalize', [True]):
+                output_node = preprocessing.Normalization().build(hp, output_node)
         if augment:
-            output_node = preprocessing.ImageAugmentation().build(hp, output_node)
+            with hp.conditional_scope('augment', [True]):
+                output_node = preprocessing.ImageAugmentation().build(hp, output_node)
         if block_type == 'resnet':
-            output_node = basic.ResNetBlock().build(hp, output_node)
+            with hp.conditional_scope('block_type', ['resnet']):
+                output_node = basic.ResNetBlock().build(hp, output_node)
         elif block_type == 'xception':
-            output_node = basic.XceptionBlock().build(hp, output_node)
+            with hp.conditional_scope('block_type', ['xception']):
+                output_node = basic.XceptionBlock().build(hp, output_node)
         elif block_type == 'vanilla':
-            output_node = basic.ConvBlock().build(hp, output_node)
+            with hp.conditional_scope('block_type', ['vanilla']):
+                output_node = basic.ConvBlock().build(hp, output_node)
         return output_node
 
 
